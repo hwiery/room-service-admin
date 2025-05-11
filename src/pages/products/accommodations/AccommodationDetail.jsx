@@ -33,6 +33,7 @@ import {
   MeetingRoom as MeetingRoomIcon
 } from '@mui/icons-material';
 import { productApi } from '../../../api';
+import OptimizedImage from '../../../components/OptimizedImage';
 
 // 목업 데이터
 const mockAccommodation = {
@@ -475,15 +476,14 @@ const AccommodationDetail = () => {
             {accommodation.images.map((image, index) => (
               <Grid item xs={12} sm={6} md={4} key={image.id}>
                 <Card>
-                  <Box
-                    component="img"
+                  <OptimizedImage
                     src={image.url}
-                    alt={image.name}
-                    sx={{
-                      width: '100%',
-                      height: 200,
-                      objectFit: 'cover',
-                    }}
+                    alt={image.name || `숙소 이미지 ${index + 1}`}
+                    height={200}
+                    fallbackSrc="/images/placeholder.svg"
+                    withSrcSet={true}
+                    size="medium"
+                    quality={85}
                   />
                   <CardContent>
                     <Typography variant="body2">{image.name || `이미지 ${index + 1}`}</Typography>

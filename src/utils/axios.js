@@ -1,4 +1,6 @@
 import axios from 'axios';
+import { sanitizeSqlParams, prepareSafeApiRequest } from './sqlSafety';
+import { sanitizeInput } from './security';
 
 // API 기본 URL 설정 (개발/운영 환경에 따라 달라질 수 있음)
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080';
@@ -112,11 +114,30 @@ instance.interceptors.request.use(
       };
     }
     
-    // 요청 전에 처리할 로직
-    // 예: 로깅, 요청 헤더 수정 등
+    // 요청 전에 보안 처리
+    
+    // 요청 데이터에 SQL 인젝션 방어 적용
+    if (config.data) {
+      // POST, PUT 요청의 데이터 보안 처리
+      config.data = prepareSafeApiRequest(config.data);
+    }
+    
+    // URL 파라미터 보안 처리
+    if (config.params) {
+      config.params = sanitizeSqlParams(config.params);
+    }
+    
+    // 인증 토큰이 로컬 스토리지에 있으면 헤더에 추가
+    const token = localStorage.getItem('authToken');
+    if (token) {
+      config.headers['Authorization'] = `Bearer ${token}`;
+    }
+    
     return config;
   },
   (error) => {
+    // 요청 에러 처리
+    console.error('API 요청 인터셉터 에러:', error);
     return Promise.reject(error);
   }
 );
@@ -128,26 +149,23 @@ instance.interceptors.response.use(
     return response;
   },
   (error) => {
-    // 오류 응답 처리
-    if (error.response) {
-      // 서버가 응답을 반환한 경우
-      const { status } = error.response;
-
-      if (status === 401) {
-        // 인증 오류 처리
-        // localStorage.removeItem('authToken');
-        // window.location.href = '/login';
-      } else if (status === 403) {
-        // 권한 오류 처리
-      } else if (status === 500) {
-        // 서버 오류 처리
+    // 에러 응답 처리
+    
+    // 인증 관련 에러 처리
+    if (error.response && error.response.status === 401) {
+      // 인증 토큰 만료 또는 유효하지 않은 경우
+      localStorage.removeItem('authToken');
+      
+      // 로그인 페이지로 리다이렉트
+      if (window.location.pathname !== '/login') {
+        window.location.href = '/login?redirect=' + encodeURIComponent(window.location.pathname);
       }
-    } else if (error.request) {
-      // 요청은 전송되었으나 응답이 없는 경우
-      console.error('서버와의 연결이 되지 않습니다.');
-    } else {
-      // 요청 설정 중 오류가 발생한 경우
-      console.error('요청 설정 중 오류가 발생했습니다.', error.message);
+    }
+    
+    // 서버 에러 처리
+    if (error.response && error.response.status >= 500) {
+      console.error('서버 에러 발생:', error.response.data);
+      // 에러 로깅 또는 사용자에게 알림 처리
     }
 
     return Promise.reject(error);

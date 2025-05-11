@@ -40,6 +40,11 @@ import {
 } from '@mui/icons-material';
 import { format, parseISO, subYears } from 'date-fns';
 import { customerApi } from '../../../api/customerApi';
+import { 
+  encryptPersonalInfo, 
+  decryptPersonalInfo, 
+  maskPersonalInfo 
+} from '../../../utils/privacy';
 
 // 목업 데이터 - 개인정보 설정
 const mockPrivacySettings = {
@@ -158,6 +163,9 @@ const PrivacyManager = () => {
     severity: 'success'
   });
 
+  // 개인정보 마스킹 상태
+  const [showMasked, setShowMasked] = useState(true);
+
   // API에서 개인정보 설정 가져오기
   useEffect(() => {
     const fetchPrivacySettings = async () => {
@@ -171,7 +179,12 @@ const PrivacyManager = () => {
         // 목업 데이터 사용 (백엔드 구현 전까지)
         setTimeout(() => {
           setSettings(mockPrivacySettings);
-          setMembersToDelete(mockMembersToDelete);
+          
+          // 개인정보 마스킹 처리
+          const maskedMembers = mockMembersToDelete.map(member => {
+            return showMasked ? maskPersonalInfo(member) : member;
+          });
+          setMembersToDelete(maskedMembers);
           setAccessLogs(mockAccessLogs);
           setLoading(false);
         }, 500);
@@ -182,7 +195,7 @@ const PrivacyManager = () => {
     };
 
     fetchPrivacySettings();
-  }, []);
+  }, [showMasked]);
 
   // 설정 변경 핸들러
   const handleSettingChange = (name, value) => {
@@ -292,6 +305,57 @@ const PrivacyManager = () => {
       member_account: '회원 계정'
     };
     return dataTypeMap[dataType] || dataType;
+  };
+
+  // 개인정보 마스킹 토글 핸들러
+  const handleToggleMasking = () => {
+    setShowMasked(!showMasked);
+  };
+
+  // 개인정보 내보내기 핸들러
+  const handleExportMemberData = async (memberId) => {
+    try {
+      // 실제 API 호출 (백엔드 구현 후 활성화)
+      // const response = await customerApi.getMemberData(memberId);
+      // const memberData = response.data;
+      
+      // 목업 데이터 사용 (백엔드 구현 전까지)
+      const memberData = membersToDelete.find(m => m.id === memberId);
+      if (!memberData) {
+        showSnackbar('회원 정보를 찾을 수 없습니다.', 'error');
+        return;
+      }
+      
+      // 개인정보 암호화 처리
+      const encryptedData = encryptPersonalInfo(memberData);
+      
+      // 암호화된 데이터를 안전하게 다운로드
+      const jsonString = JSON.stringify(encryptedData, null, 2);
+      const blob = new Blob([jsonString], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `member_data_${memberId}_encrypted.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      
+      showSnackbar('회원 정보가 암호화되어 다운로드되었습니다.');
+      
+      // 접근 로그 기록 (실제 구현 시)
+      // await customerApi.logAccess({
+      //   action: 'export',
+      //   dataType: 'member_data',
+      //   targetId: memberId,
+      //   targetName: memberData.name
+      // });
+      
+    } catch (error) {
+      console.error('회원 정보 내보내기 중 오류가 발생했습니다:', error);
+      showSnackbar('회원 정보 내보내기 중 오류가 발생했습니다.', 'error');
+    }
   };
 
   if (loading && !settings) {
@@ -645,6 +709,20 @@ const PrivacyManager = () => {
           {snackbar.message}
         </Alert>
       </Snackbar>
+
+      {/* 추가: 개인정보 마스킹 토글 버튼 */}
+      <Box sx={{ mt: 3, mb: 2, display: 'flex', justifyContent: 'flex-end' }}>
+        <FormControlLabel
+          control={
+            <Switch
+              checked={showMasked}
+              onChange={handleToggleMasking}
+              color="primary"
+            />
+          }
+          label="개인정보 마스킹"
+        />
+      </Box>
     </Container>
   );
 };

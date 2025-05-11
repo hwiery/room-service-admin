@@ -1,53 +1,80 @@
+import React, { Suspense, lazy } from 'react';
 import { Navigate } from 'react-router-dom';
 
 // 레이아웃
 import Layout from './components/layout/Layout';
 import ProtectedRoute from './components/common/ProtectedRoute';
 
-// 인증 페이지
+// 로딩 컴포넌트
+import { Box, CircularProgress, Typography } from '@mui/material';
+
+// 즉시 로드되는 컴포넌트
 import Login from './pages/auth/Login';
 import ForgotPassword from './pages/auth/ForgotPassword';
-
-// 대시보드
-import Dashboard from './pages/dashboard/Dashboard';
-
-// 오류 페이지
 import NotFound from './pages/notFound/NotFound';
 
+// 지연 로딩 컴포넌트
+const Dashboard = lazy(() => import('./pages/dashboard/Dashboard'));
+
 // 숙소 관리 페이지
-import AccommodationList from './pages/products/accommodations/AccommodationList';
-import AccommodationDetail from './pages/products/accommodations/AccommodationDetail';
-import AccommodationNew from './pages/products/accommodations/AccommodationNew';
-import AccommodationEdit from './pages/products/accommodations/AccommodationEdit';
+const AccommodationList = lazy(() => import('./pages/products/accommodations/AccommodationList'));
+const AccommodationDetail = lazy(() => import('./pages/products/accommodations/AccommodationDetail'));
+const AccommodationNew = lazy(() => import('./pages/products/accommodations/AccommodationNew'));
+const AccommodationEdit = lazy(() => import('./pages/products/accommodations/AccommodationEdit'));
 
 // 카테고리 관리 페이지
-import CategoryList from './pages/products/categories/CategoryList';
+const CategoryList = lazy(() => import('./pages/products/categories/CategoryList'));
 
 // 편의시설 관리 페이지
-import AmenityList from './pages/products/amenities/AmenityList';
+const AmenityList = lazy(() => import('./pages/products/amenities/AmenityList'));
 
 // 취소/환불 규정 관리 페이지
-import CancellationPolicyList from './pages/products/policies/CancellationPolicyList';
+const CancellationPolicyList = lazy(() => import('./pages/products/policies/CancellationPolicyList'));
 
 // 예약 관리 페이지
-import ReservationList from './pages/reservations/ReservationList';
-import ReservationDetail from './pages/reservations/ReservationDetail';
-import ReservationCalendar from './pages/reservations/ReservationCalendar';
-import ReservationDashboard from './pages/reservations/ReservationDashboard';
+const ReservationList = lazy(() => import('./pages/reservations/ReservationList'));
+const ReservationDetail = lazy(() => import('./pages/reservations/ReservationDetail'));
+const ReservationCalendar = lazy(() => import('./pages/reservations/ReservationCalendar'));
+const ReservationDashboard = lazy(() => import('./pages/reservations/ReservationDashboard'));
 
 // 고객 관리 페이지
-import MemberList from './pages/customers/members/MemberList';
-import MemberDetail from './pages/customers/members/MemberDetail';
-import BlacklistManager from './pages/customers/members/BlacklistManager';
-import ReviewList from './pages/customers/reviews/ReviewList';
-import PrivacyManager from './pages/customers/privacy/PrivacyManager';
-import CustomerStats from './pages/customers/stats/CustomerStats';
+const MemberList = lazy(() => import('./pages/customers/members/MemberList'));
+const MemberDetail = lazy(() => import('./pages/customers/members/MemberDetail'));
+const BlacklistManager = lazy(() => import('./pages/customers/members/BlacklistManager'));
+const ReviewList = lazy(() => import('./pages/customers/reviews/ReviewList'));
+const PrivacyManager = lazy(() => import('./pages/customers/privacy/PrivacyManager'));
+const CustomerStats = lazy(() => import('./pages/customers/stats/CustomerStats'));
 
 // 프로모션 관리 페이지
-import PromotionList from './pages/contents/promotions/PromotionList';
-import PromotionDetail from './pages/contents/promotions/PromotionDetail';
-import PromotionNew from './pages/contents/promotions/PromotionNew';
-import PromotionEdit from './pages/contents/promotions/PromotionEdit';
+const PromotionList = lazy(() => import('./pages/contents/promotions/PromotionList'));
+const PromotionDetail = lazy(() => import('./pages/contents/promotions/PromotionDetail'));
+const PromotionNew = lazy(() => import('./pages/contents/promotions/PromotionNew'));
+const PromotionEdit = lazy(() => import('./pages/contents/promotions/PromotionEdit'));
+
+// 시스템 설정 페이지
+const GeneralSettings = lazy(() => import('./pages/settings/GeneralSettings'));
+const PaymentSettings = lazy(() => import('./pages/settings/PaymentSettings'));
+
+// 리포트 페이지
+const ReportDashboard = lazy(() => import('./pages/reports/ReportDashboard'));
+
+// 로딩 표시 컴포넌트
+const LoadingComponent = () => (
+  <Box
+    sx={{
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      minHeight: '400px',
+    }}
+  >
+    <CircularProgress size={60} sx={{ mb: 3 }} />
+    <Typography variant="h6" color="text.secondary">
+      컴포넌트를 불러오는 중...
+    </Typography>
+  </Box>
+);
 
 /**
  * 애플리케이션 라우트 정의
@@ -75,7 +102,11 @@ const routes = [
         children: [
           {
             path: 'dashboard',
-            element: <Dashboard />,
+            element: (
+              <Suspense fallback={<LoadingComponent />}>
+                <Dashboard />
+              </Suspense>
+            ),
           },
           // 추후 구현 예정인 라우트들
           {
@@ -90,19 +121,35 @@ const routes = [
                 children: [
                   {
                     path: '',
-                    element: <AccommodationList />,
+                    element: (
+                      <Suspense fallback={<LoadingComponent />}>
+                        <AccommodationList />
+                      </Suspense>
+                    ),
                   },
                   {
                     path: 'new',
-                    element: <AccommodationNew />,
+                    element: (
+                      <Suspense fallback={<LoadingComponent />}>
+                        <AccommodationNew />
+                      </Suspense>
+                    ),
                   },
                   {
                     path: ':id',
-                    element: <AccommodationDetail />,
+                    element: (
+                      <Suspense fallback={<LoadingComponent />}>
+                        <AccommodationDetail />
+                      </Suspense>
+                    ),
                   },
                   {
                     path: ':id/edit',
-                    element: <AccommodationEdit />,
+                    element: (
+                      <Suspense fallback={<LoadingComponent />}>
+                        <AccommodationEdit />
+                      </Suspense>
+                    ),
                   }
                 ],
               },
@@ -112,15 +159,27 @@ const routes = [
               },
               {
                 path: 'categories',
-                element: <CategoryList />,
+                element: (
+                  <Suspense fallback={<LoadingComponent />}>
+                    <CategoryList />
+                  </Suspense>
+                ),
               },
               {
                 path: 'amenities',
-                element: <AmenityList />,
+                element: (
+                  <Suspense fallback={<LoadingComponent />}>
+                    <AmenityList />
+                  </Suspense>
+                ),
               },
               {
                 path: 'policies',
-                element: <CancellationPolicyList />,
+                element: (
+                  <Suspense fallback={<LoadingComponent />}>
+                    <CancellationPolicyList />
+                  </Suspense>
+                ),
               },
             ],
           },
@@ -129,19 +188,35 @@ const routes = [
             children: [
               {
                 path: '',
-                element: <ReservationList />,
+                element: (
+                  <Suspense fallback={<LoadingComponent />}>
+                    <ReservationList />
+                  </Suspense>
+                ),
               },
               {
                 path: 'calendar',
-                element: <ReservationCalendar />,
+                element: (
+                  <Suspense fallback={<LoadingComponent />}>
+                    <ReservationCalendar />
+                  </Suspense>
+                ),
               },
               {
                 path: 'dashboard',
-                element: <ReservationDashboard />,
+                element: (
+                  <Suspense fallback={<LoadingComponent />}>
+                    <ReservationDashboard />
+                  </Suspense>
+                ),
               },
               {
                 path: ':id',
-                element: <ReservationDetail />,
+                element: (
+                  <Suspense fallback={<LoadingComponent />}>
+                    <ReservationDetail />
+                  </Suspense>
+                ),
               },
             ],
           },
@@ -154,27 +229,51 @@ const routes = [
               },
               {
                 path: 'members',
-                element: <MemberList />,
+                element: (
+                  <Suspense fallback={<LoadingComponent />}>
+                    <MemberList />
+                  </Suspense>
+                ),
               },
               {
                 path: 'members/blacklist',
-                element: <BlacklistManager />,
+                element: (
+                  <Suspense fallback={<LoadingComponent />}>
+                    <BlacklistManager />
+                  </Suspense>
+                ),
               },
               {
                 path: 'privacy',
-                element: <PrivacyManager />,
+                element: (
+                  <Suspense fallback={<LoadingComponent />}>
+                    <PrivacyManager />
+                  </Suspense>
+                ),
               },
               {
                 path: 'members/stats',
-                element: <CustomerStats />,
+                element: (
+                  <Suspense fallback={<LoadingComponent />}>
+                    <CustomerStats />
+                  </Suspense>
+                ),
               },
               {
                 path: 'members/:id',
-                element: <MemberDetail />,
+                element: (
+                  <Suspense fallback={<LoadingComponent />}>
+                    <MemberDetail />
+                  </Suspense>
+                ),
               },
               {
                 path: 'reviews',
-                element: <ReviewList />,
+                element: (
+                  <Suspense fallback={<LoadingComponent />}>
+                    <ReviewList />
+                  </Suspense>
+                ),
               },
             ],
           },
@@ -187,19 +286,35 @@ const routes = [
               },
               {
                 path: 'promotions',
-                element: <PromotionList />,
+                element: (
+                  <Suspense fallback={<LoadingComponent />}>
+                    <PromotionList />
+                  </Suspense>
+                ),
               },
               {
                 path: 'promotions/new',
-                element: <PromotionNew />,
+                element: (
+                  <Suspense fallback={<LoadingComponent />}>
+                    <PromotionNew />
+                  </Suspense>
+                ),
               },
               {
                 path: 'promotions/:id',
-                element: <PromotionDetail />,
+                element: (
+                  <Suspense fallback={<LoadingComponent />}>
+                    <PromotionDetail />
+                  </Suspense>
+                ),
               },
               {
                 path: 'promotions/:id/edit',
-                element: <PromotionEdit />,
+                element: (
+                  <Suspense fallback={<LoadingComponent />}>
+                    <PromotionEdit />
+                  </Suspense>
+                ),
               },
               {
                 path: 'main',
@@ -213,7 +328,45 @@ const routes = [
           },
           {
             path: 'settings',
-            element: <div>시스템 설정 페이지</div>,
+            children: [
+              {
+                path: '',
+                element: <Navigate to="/settings/general" replace />,
+              },
+              {
+                path: 'general',
+                element: (
+                  <Suspense fallback={<LoadingComponent />}>
+                    <GeneralSettings />
+                  </Suspense>
+                ),
+              },
+              {
+                path: 'payment',
+                element: (
+                  <Suspense fallback={<LoadingComponent />}>
+                    <PaymentSettings />
+                  </Suspense>
+                ),
+              },
+            ],
+          },
+          {
+            path: 'reports',
+            children: [
+              {
+                path: '',
+                element: <Navigate to="/reports/dashboard" replace />,
+              },
+              {
+                path: 'dashboard',
+                element: (
+                  <Suspense fallback={<LoadingComponent />}>
+                    <ReportDashboard />
+                  </Suspense>
+                ),
+              },
+            ],
           },
         ],
       },

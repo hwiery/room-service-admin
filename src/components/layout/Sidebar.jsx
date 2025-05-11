@@ -142,11 +142,38 @@ const NAV_ITEMS = [
     ]
   },
   {
+    id: 'reports',
+    label: '데이터 분석',
+    icon: <EqualizerIcon />,
+    requiredRole: 'admin',
+    subItems: [
+      {
+        id: 'reports-dashboard',
+        label: '데이터 대시보드',
+        path: '/reports/dashboard',
+        requiredRole: 'admin'
+      }
+    ]
+  },
+  {
     id: 'settings',
     label: '시스템 설정',
-    path: '/settings',
     icon: <SettingsIcon />,
-    requiredRole: 'superadmin'
+    requiredRole: 'superadmin',
+    subItems: [
+      {
+        id: 'settings-general',
+        label: '기본 설정',
+        path: '/settings/general',
+        requiredRole: 'superadmin'
+      },
+      {
+        id: 'settings-payment',
+        label: '결제 설정',
+        path: '/settings/payment',
+        requiredRole: 'superadmin'
+      }
+    ]
   }
 ];
 
