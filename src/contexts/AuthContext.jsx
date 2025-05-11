@@ -1,5 +1,6 @@
 import React, { createContext, useState, useEffect } from 'react';
 import { authApi } from '../api';
+import { secureStorage } from '../utils/crypto';
 
 // 인증 컨텍스트 생성
 export const AuthContext = createContext(null);
@@ -19,7 +20,7 @@ export const AuthProvider = ({ children }) => {
   
   // 컴포넌트 마운트 시 로컬 스토리지에서 토큰을 확인하고 유효성 검증
   useEffect(() => {
-    const token = localStorage.getItem('authToken');
+    const token = secureStorage.getItem('authToken');
     if (token) {
       verifyToken(token);
     } else {
@@ -56,8 +57,9 @@ export const AuthProvider = ({ children }) => {
       const response = await authApi.login(username, password);
       const { token, user } = response.data;
       
-      // 토큰 저장 및 사용자 정보 설정
-      localStorage.setItem('authToken', token);
+      // 암호화하여 토큰 저장 및 사용자 정보 설정
+      secureStorage.setItem('authToken', token);
+      secureStorage.setItem('userData', user);
       authApi.setAuthHeader(token);
       setCurrentUser(user);
       
@@ -76,7 +78,8 @@ export const AuthProvider = ({ children }) => {
    */
   const logout = () => {
     // 토큰 및 사용자 정보 제거
-    localStorage.removeItem('authToken');
+    secureStorage.removeItem('authToken');
+    secureStorage.removeItem('userData');
     authApi.removeAuthHeader();
     setCurrentUser(null);
   };

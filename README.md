@@ -8,6 +8,7 @@
 - React 19
 - Material-UI 7
 - React Router Dom 7
+- React Query (@tanstack/react-query)
 
 ## 설치 및 실행 방법
 
@@ -45,6 +46,7 @@
 - 로그인/로그아웃
 - 비밀번호 찾기
 - 인증 상태 유지
+- 보안 강화된 토큰 관리
 
 ### 2. 콘텐츠 관리
 - 이용약관 관리 (목록, 상세, 등록, 수정)
@@ -73,22 +75,49 @@
 - 리뷰 관리
 - 고객 통계
 
+### 6. 시스템 설정
+- 사이트 기본 설정
+- 결제 게이트웨이 설정
+- 개인정보 보호 설정
+
+### 7. 성능 최적화
+- 이미지 최적화 (CDN 연동)
+- 코드 스플리팅
+- 지연 로딩
+- API 호출 최적화 (React Query)
+
+### 8. 보안 기능
+- XSS 방어
+- CSRF 방어
+- SQL 인젝션 방어
+- 데이터 암호화
+- 세션 타임아웃 설정
+
 ## 프로젝트 구조
 
 ```
 src/
 ├── api/                # API 호출 함수
 ├── components/         # 재사용 가능한 컴포넌트
+├── config/             # 설정 파일
 ├── contexts/           # React Context API
 ├── hooks/              # 커스텀 훅
+│   └── queries/        # React Query 관련 훅
 ├── pages/              # 페이지 컴포넌트
 │   ├── auth/           # 인증 관련 페이지
 │   ├── contents/       # 콘텐츠 관리 페이지
 │   ├── customers/      # 고객 관리 페이지
 │   ├── dashboard/      # 대시보드 페이지
 │   ├── products/       # 상품 관리 페이지
-│   └── reservations/   # 예약 관리 페이지
+│   ├── reports/        # 리포트 페이지
+│   ├── reservations/   # 예약 관리 페이지
+│   └── settings/       # 설정 페이지
 ├── utils/              # 유틸리티 함수
+│   ├── cdn.js          # CDN 관련 유틸리티
+│   ├── crypto.js       # 암호화 유틸리티
+│   ├── privacy.js      # 개인정보 처리 유틸리티
+│   ├── security.js     # 보안 관련 유틸리티
+│   └── sqlSafety.js    # SQL 인젝션 방어 유틸리티
 ├── App.js              # 앱 진입점
 ├── index.js            # React 렌더링 진입점
 └── routes.js           # 라우트 정의
@@ -101,15 +130,20 @@ src/
 - 이용약관 관리 기능 (목록, 상세, 등록, 수정)
 - SEO 최적화 설정 기능
 - 기본 레이아웃 및 UI 프레임워크 구축
+- 숙소 및 예약 관리 기능
+- 이미지 최적화 및 CDN 활용
+- XSS, CSRF, SQL 인젝션 방어
+- 데이터 암호화 및 보안 기능
 
 ### 진행 중인 항목
 - 백엔드 API 연동
 - 실제 인증 시스템 연결
 - 추가 콘텐츠 관리 기능 고도화
+- 데이터 검증 및 무결성 검사
 
 ## 백엔드 API 연동
 
-현재는 모의 API 응답을 사용하여 프론트엔드 개발을 진행하고 있습니다. 백엔드 서버가 개발되면 `src/utils/axios.js` 파일을 수정하여 실제 API 서버와 연동하면 됩니다.
+현재는 모의 API 응답을 사용하여 프론트엔드 개발을 진행하고 있습니다. 백엔드 서버가 개발되면 `src/utils/axios.js` 파일의 API_URL을 수정하여 실제 API 서버와 연동하면 됩니다.
 
 ## 라이센스
 
